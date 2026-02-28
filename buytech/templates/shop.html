@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Shop{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="bt-page-header">
+    <div class="container">
+        <h1 class="fw-800 mb-1">Shop All Products</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+                <li class="breadcrumb-item active">Shop
+                    {% if selected_category %}— {{ selected_category }}{% endif %}
+                </li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+
+        <!-- ── SIDEBAR FILTERS ── -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 90px;">
+                <h6 class="fw-800 mb-3">
+                    <i class="bi bi-funnel me-2 text-primary"></i>Filter by Category
+                </h6>
+                <div class="d-grid gap-2">
+                    <!-- "All" button -->
+                    <a href="{{ url_for('shop') }}"
+                       class="btn rounded-pill text-start {% if not selected_category %}btn-primary text-white{% else %}btn-light{% endif %}">
+                        <i class="bi bi-grid me-2"></i>All Products
+                    </a>
+                    <!-- Category buttons -->
+                    {% for cat in categories %}
+                    <a href="{{ url_for('shop', category=cat) }}"
+                       class="btn rounded-pill text-start {% if selected_category == cat %}btn-primary text-white{% else %}btn-light{% endif %}">
+                        {% if cat == 'Phones' %}<i class="bi bi-phone me-2"></i>
+                        {% elif cat == 'Laptops' %}<i class="bi bi-laptop me-2"></i>
+                        {% elif cat == 'TVs' %}<i class="bi bi-tv me-2"></i>
+                        {% else %}<i class="bi bi-headphones me-2"></i>{% endif %}
+                        {{ cat }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Product count info -->
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-box-seam me-1 text-primary"></i>
+                    Showing <strong>{{ products|length }}</strong> product(s)
+                    {% if selected_category %}in <strong>{{ selected_category }}</strong>{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- ── PRODUCT GRID ── -->
+        <div class="col-lg-9">
+
+            <!-- Top bar -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-700 mb-0">
+                    {% if selected_category %}
+                        {{ selected_category }}
+                    {% else %}
+                        All Products
+                    {% endif %}
+                </h5>
+                <span class="text-muted small">{{ products|length }} items found</span>
+            </div>
+
+            {% if products %}
+            <div class="row g-4">
+                {% for product in products %}
+                <div class="col-sm-6 col-xl-4">
+                    <div class="bt-product-card h-100">
+                        <div class="bt-product-img-wrap">
+                            <img src="{{ product.image }}" alt="{{ product.name }}"
+                                 class="bt-product-img" loading="lazy" />
+                            <span class="bt-category-badge">{{ product.category }}</span>
+                            {% if product.featured %}
+                            <span class="bt-featured-badge">
+                                <i class="bi bi-star-fill"></i> Featured
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="p-3 d-flex flex-column flex-grow-1">
+                            <h6 class="fw-700 mb-1">{{ product.name }}</h6>
+                            <p class="text-muted small mb-3 flex-grow-1">
+                                {{ product.description[:90] }}...
+                            </p>
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+                                <span class="fw-800 text-primary fs-5">${{ "%.2f"|format(product.price) }}</span>
+                                <div class="d-flex gap-1">
+                                    <a href="{{ url_for('product_detail', product_id=product.id) }}"
+                                       class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                        Details
+                                    </a>
+                                    {% if current_user.is_authenticated and not current_user.is_admin %}
+                                    <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
+                                        <input type="hidden" name="next" value="{{ request.url }}" />
+                                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3"
+                                                title="Add to Cart">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </button>
+                                    </form>
+                                    {% elif not current_user.is_authenticated %}
+                                    <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                                       title="Login to add to cart">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <!-- Empty state -->
+            <div class="text-center py-5">
+                <i class="bi bi-search display-3 text-muted"></i>
+                <h5 class="mt-3 fw-700">No products found</h5>
+                <p class="text-muted">Try a different category or
+                    <a href="{{ url_for('shop') }}">view all products</a>.
+                </p>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

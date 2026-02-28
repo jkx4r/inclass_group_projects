@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('shop') }}">Shop</a></li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('shop', category=product.category) }}">{{ product.category }}</a>
+            </li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- ── PRODUCT DETAIL ── -->
+    <div class="row g-5 align-items-start">
+
+        <!-- Product Image -->
+        <div class="col-lg-6">
+            <div class="bt-detail-img-wrap">
+                <img src="{{ product.image }}" alt="{{ product.name }}"
+                     class="img-fluid rounded-4 w-100 bt-detail-img" />
+                <span class="bt-category-badge fs-6 px-3 py-2">{{ product.category }}</span>
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-6">
+            {% if product.featured %}
+            <span class="badge bg-warning text-dark rounded-pill mb-2 px-3 py-2">
+                <i class="bi bi-star-fill me-1"></i>Featured Product
+            </span>
+            {% endif %}
+
+            <h1 class="fw-800 mb-2">{{ product.name }}</h1>
+
+            <!-- Star rating (decorative) -->
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="text-warning">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-half"></i>
+                </div>
+                <span class="text-muted small">(4.5 / 5 · 128 reviews)</span>
+            </div>
+
+            <!-- Price -->
+            <div class="bt-price-box mb-4">
+                <span class="display-5 fw-800 text-primary">${{ "%.2f"|format(product.price) }}</span>
+                <span class="text-muted text-decoration-line-through ms-2 fs-5">
+                    ${{ "%.2f"|format(product.price * 1.2) }}
+                </span>
+                <span class="badge bg-danger ms-2 fs-6">20% OFF</span>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <h6 class="fw-700 mb-2">About this product</h6>
+                <p class="text-muted lh-lg">{{ product.description }}</p>
+            </div>
+
+            <!-- Add to Cart — only for regular logged-in users -->
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                <!-- Admin sees manage options instead of add-to-cart -->
+                <div class="d-flex gap-3 flex-wrap align-items-center p-3 rounded-3"
+                     style="background:#e8eaf6;border:1px solid #c5cae9;">
+                    <i class="bi bi-shield-check text-primary fs-5"></i>
+                    <span class="fw-600 text-primary small">Admin View</span>
+                    <a href="{{ url_for('admin_edit_product', product_id=product.id) }}"
+                       class="btn btn-primary btn-sm rounded-pill px-4 fw-600">
+                        <i class="bi bi-pencil-fill me-1"></i>Edit in Admin Panel
+                    </a>
+                    <a href="{{ url_for('admin_dashboard') }}"
+                       class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-600">
+                        <i class="bi bi-grid-1x2-fill me-1"></i>Dashboard
+                    </a>
+                </div>
+                {% else %}
+                <!-- Regular user: show Add to Cart -->
+                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-600">
+                            <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                        </button>
+                        <a href="{{ url_for('shop') }}"
+                           class="btn btn-outline-secondary btn-lg rounded-pill px-4">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </form>
+                {% endif %}
+            {% else %}
+            <div class="alert alert-light border rounded-3">
+                <i class="bi bi-info-circle text-primary me-2"></i>
+                <a href="{{ url_for('login') }}" class="fw-600">Login</a> or
+                <a href="{{ url_for('register') }}" class="fw-600">Register</a>
+                to add items to your cart.
+            </div>
+            {% endif %}
+
+            <!-- Product meta -->
+            <div class="mt-4 pt-4 border-top">
+                <div class="row g-2 text-center">
+                    <div class="col-4">
+                        <i class="bi bi-truck text-primary fs-4 d-block mb-1"></i>
+                        <small class="text-muted">Free Shipping</small>
+                    </div>
+                    <div class="col-4">
+                        <i class="bi bi-arrow-repeat text-primary fs-4 d-block mb-1"></i>
+                        <small class="text-muted">30-Day Return</small>
+                    </div>
+                    <div class="col-4">
+                        <i class="bi bi-shield-check text-primary fs-4 d-block mb-1"></i>
+                        <small class="text-muted">2yr Warranty</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── RELATED PRODUCTS ── -->
+    {% if related %}
+    <hr class="my-5">
+    <h4 class="fw-800 mb-4">You Might Also Like</h4>
+    <div class="row g-4">
+        {% for item in related %}
+        <div class="col-6 col-md-3">
+            <div class="bt-product-card h-100">
+                <div class="bt-product-img-wrap">
+                    <img src="{{ item.image }}" alt="{{ item.name }}"
+                         class="bt-product-img" loading="lazy" />
+                </div>
+                <div class="p-3">
+                    <h6 class="fw-700 mb-1 small">{{ item.name }}</h6>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="fw-800 text-primary">${{ "%.2f"|format(item.price) }}</span>
+                        <a href="{{ url_for('product_detail', product_id=item.id) }}"
+                           class="btn btn-sm btn-outline-primary rounded-pill">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

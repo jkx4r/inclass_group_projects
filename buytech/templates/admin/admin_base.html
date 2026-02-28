@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Admin{% endblock %} — BuyTech Admin</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+    /* ═══════════════════════════════════════════
+       BuyTech Admin Panel — Layout & Styles
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+        --sidebar-w:    260px;
+        --sidebar-bg:   #0f1117;
+        --sidebar-hover:#1e2230;
+        --sidebar-active:#1428a0;
+        --topbar-h:     64px;
+        --primary:      #1428a0;
+        --primary-light:#e8eaf6;
+        --body-bg:      #f4f6fb;
+        --card-bg:      #ffffff;
+        --border:       #e8eaef;
+        --text:         #1a1a2e;
+        --muted:        #6b7280;
+        --radius:       14px;
+        --shadow:       0 2px 16px rgba(0,0,0,0.07);
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--body-bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .adm-sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        width: var(--sidebar-w);
+        height: 100vh;
+        background: var(--sidebar-bg);
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #333 transparent;
+    }
+
+    .adm-sidebar::-webkit-scrollbar { width: 4px; }
+    .adm-sidebar::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+
+    .adm-logo {
+        padding: 24px 20px 20px;
+        border-bottom: 1px solid #1e2230;
+        flex-shrink: 0;
+    }
+
+    .adm-logo-text {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #ffffff;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .adm-logo-icon {
+        width: 36px; height: 36px;
+        background: var(--primary);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .adm-logo-sub {
+        font-size: 0.65rem;
+        font-weight: 500;
+        color: #5a5f7a;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    /* Nav sections */
+    .adm-nav {
+        padding: 16px 12px;
+        flex: 1;
+    }
+
+    .adm-nav-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #3d4265;
+        padding: 12px 10px 6px;
+    }
+
+    .adm-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: #8892b0;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        margin-bottom: 2px;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+    }
+
+    .adm-nav-link:hover {
+        background: var(--sidebar-hover);
+        color: #e0e6ff;
+    }
+
+    .adm-nav-link.active {
+        background: var(--sidebar-active);
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .adm-nav-link .adm-icon {
+        width: 20px;
+        text-align: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .adm-nav-link .adm-badge {
+        margin-left: auto;
+        background: #1e2230;
+        color: #8892b0;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 20px;
+    }
+
+    .adm-nav-link.active .adm-badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    /* Sidebar footer */
+    .adm-sidebar-footer {
+        padding: 16px 12px;
+        border-top: 1px solid #1e2230;
+        flex-shrink: 0;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .adm-main {
+        margin-left: var(--sidebar-w);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── TOP BAR ── */
+    .adm-topbar {
+        height: var(--topbar-h);
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 28px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+    }
+
+    .adm-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .adm-page-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .adm-breadcrumb {
+        font-size: 0.75rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .adm-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .adm-admin-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+    .adm-admin-avatar {
+        width: 28px; height: 28px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    /* ── CONTENT AREA ── */
+    .adm-content {
+        padding: 28px;
+        flex: 1;
+    }
+
+    /* ── STAT CARDS ── */
+    .adm-stat-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 22px 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .adm-stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    }
+
+    .adm-stat-icon {
+        width: 52px; height: 52px;
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+    }
+
+    .adm-stat-val {
+        font-size: 1.7rem;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--text);
+    }
+
+    .adm-stat-label {
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-weight: 500;
+        margin-top: 3px;
+    }
+
+    /* ── PANEL CARD ── */
+    .adm-panel {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+
+    .adm-panel-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .adm-panel-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ── TABLE ── */
+    .adm-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    .adm-table thead th {
+        background: #f8f9fc;
+        padding: 12px 16px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--muted);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+
+    .adm-table tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f2f8;
+        vertical-align: middle;
+    }
+
+    .adm-table tbody tr:hover td {
+        background: #fafbff;
+    }
+
+    .adm-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .adm-product-thumb {
+        width: 52px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+    }
+
+    /* Category pill */
+    .cat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+    .cat-pill-phones     { background: #e8eaf6; color: #1428a0; }
+    .cat-pill-laptops    { background: #fff8e1; color: #f59e0b; }
+    .cat-pill-tvs        { background: #e8f5e9; color: #16a34a; }
+    .cat-pill-accessories{ background: #fce8e8; color: #dc2626; }
+
+    /* Feature pill */
+    .feat-yes { background: #fff8e1; color: #d97706; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+    .feat-no  { background: #f3f4f6; color: #9ca3af; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+
+    /* Action buttons */
+    .adm-btn-edit {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 5px 12px; border-radius: 8px;
+        background: #e8eaf6; color: #1428a0;
+        font-size: 0.78rem; font-weight: 600;
+        border: none; cursor: pointer;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+    .adm-btn-edit:hover { background: #d0d4f0; color: #1428a0; }
+
+    .adm-btn-delete {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 5px 12px; border-radius: 8px;
+        background: #fce8e8; color: #dc2626;
+        font-size: 0.78rem; font-weight: 600;
+        border: none; cursor: pointer;
+        transition: background 0.15s;
+    }
+    .adm-btn-delete:hover { background: #fecaca; }
+
+    .adm-btn-primary {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 18px; border-radius: 10px;
+        background: var(--primary); color: white;
+        font-size: 0.85rem; font-weight: 600;
+        border: none; cursor: pointer;
+        text-decoration: none;
+        transition: background 0.15s, transform 0.1s;
+    }
+    .adm-btn-primary:hover { background: #0f1e8a; color: white; transform: translateY(-1px); }
+
+    .adm-btn-secondary {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 16px; border-radius: 10px;
+        background: #f3f4f6; color: #374151;
+        font-size: 0.85rem; font-weight: 600;
+        border: none; cursor: pointer;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+    .adm-btn-secondary:hover { background: #e5e7eb; color: #374151; }
+
+    /* ── MODAL overrides ── */
+    .modal-content { border: none; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+    .modal-header  { border-bottom: 1px solid var(--border); padding: 20px 24px; }
+    .modal-body    { padding: 24px; }
+    .modal-footer  { border-top: 1px solid var(--border); padding: 16px 24px; }
+    .modal-title   { font-weight: 700; font-size: 1rem; }
+
+    .form-label    { font-size: 0.82rem; font-weight: 600; color: #374151; }
+    .form-control, .form-select { border-radius: 10px; font-size: 0.88rem; border-color: var(--border); }
+    .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(20,40,160,0.10); }
+    .input-group-text { border-radius: 10px 0 0 10px; border-color: var(--border); background: #f8f9fc; }
+
+    /* ── EMPTY STATE ── */
+    .adm-empty {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--muted);
+    }
+    .adm-empty i { font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 12px; }
+    .adm-empty p { font-size: 0.88rem; margin-bottom: 16px; }
+
+    /* ── NAV TABS ── */
+    .adm-tabs { display: flex; gap: 4px; padding: 16px 24px 0; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+    .adm-tab-btn {
+        padding: 8px 16px;
+        border-radius: 8px 8px 0 0;
+        border: none; background: none;
+        font-size: 0.83rem; font-weight: 600;
+        color: var(--muted); cursor: pointer;
+        transition: all 0.15s;
+        position: relative;
+        bottom: -1px;
+    }
+    .adm-tab-btn:hover { color: var(--primary); background: var(--primary-light); }
+    .adm-tab-btn.active { color: var(--primary); background: white; border: 1px solid var(--border); border-bottom: 1px solid white; }
+    .adm-tab-count { font-size: 0.65rem; background: #e8eaf6; color: var(--primary); padding: 1px 7px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
+    .adm-tab-btn.active .adm-tab-count { background: var(--primary); color: white; }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* ── FLASH MESSAGES ── */
+    .adm-flash {
+        padding: 28px 28px 0;
+    }
+    .adm-flash .alert {
+        border: none; border-radius: 12px; font-size: 0.875rem; font-weight: 500;
+        display: flex; align-items: center; gap: 10px;
+    }
+
+    /* ── RESPONSIVE ── */
+    .adm-mobile-toggle {
+        display: none;
+        background: none; border: none;
+        font-size: 1.3rem; color: var(--text);
+        cursor: pointer;
+    }
+
+    /* ══════════════════════════════════════
+       IMAGE UPLOAD UI
+    ══════════════════════════════════════ */
+
+    /* Tab switcher row */
+    .img-source-tabs {
+        display: flex;
+        gap: 6px;
+    }
+    .img-tab-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 14px; border-radius: 8px;
+        border: 1.5px solid var(--border);
+        background: #f8f9fc; color: #6b7280;
+        font-size: 0.8rem; font-weight: 600;
+        cursor: pointer; transition: all 0.15s;
+    }
+    .img-tab-btn:hover   { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+    .img-tab-btn.active  { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+    .img-tab-pane        { display: none; }
+    .img-tab-pane.active { display: block; }
+
+    /* Drag & Drop zone */
+    .drop-zone {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        background: #f9fafb;
+        padding: 28px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        min-height: 130px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+        border-color: var(--primary);
+        background: var(--primary-light);
+    }
+    .drop-zone.drag-over { transform: scale(1.01); }
+
+    .drop-icon {
+        font-size: 2.2rem;
+        color: #9ca3af;
+        display: block;
+        margin-bottom: 8px;
+        transition: color 0.2s;
+    }
+    .drop-zone:hover .drop-icon, .drop-zone.drag-over .drop-icon {
+        color: var(--primary);
+    }
+    .drop-text {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #374151;
+        margin: 0;
+        line-height: 1.5;
+    }
+    .drop-hint {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: #9ca3af;
+    }
+
+    /* File info row (after selecting) */
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+    }
+    .upload-preview {
+        width: 80px; height: 64px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+    .file-meta {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        text-align: left;
+    }
+    .file-name {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #1f2937;
+        word-break: break-all;
+    }
+    .file-size {
+        font-size: 0.72rem;
+        color: #6b7280;
+        background: #f3f4f6;
+        padding: 2px 8px;
+        border-radius: 10px;
+        display: inline-block;
+        width: fit-content;
+    }
+    .clear-btn {
+        display: inline-flex; align-items: center; gap: 4px;
+        margin-top: 4px;
+        border: none; background: none;
+        color: #ef4444; font-size: 0.75rem; font-weight: 600;
+        cursor: pointer; padding: 0;
+    }
+    .clear-btn:hover { color: #b91c1c; }
+
+    /* Current image (in Edit modal) */
+    .current-img-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    .current-img-thumb {
+        width: 100%;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+    }
+
+    @media (max-width: 992px) {
+        .adm-sidebar { transform: translateX(-100%); }
+        .adm-sidebar.open { transform: translateX(0); }
+        .adm-main { margin-left: 0; }
+        .adm-mobile-toggle { display: block; }
+        .adm-content { padding: 16px; }
+    }
+    </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="adm-sidebar" id="adminSidebar">
+
+    <!-- Logo -->
+    <div class="adm-logo">
+        <a href="{{ url_for('admin_dashboard') }}" class="adm-logo-text">
+            <div class="adm-logo-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+            <div>
+                BuyTech
+                <span class="adm-logo-sub">Admin Panel</span>
+            </div>
+        </a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="adm-nav">
+
+        <div class="adm-nav-label">Overview</div>
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="adm-nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+            <i class="bi bi-grid-1x2-fill adm-icon"></i>
+            Dashboard
+        </a>
+
+        <div class="adm-nav-label mt-2">Catalog</div>
+        <a href="{{ url_for('admin_dashboard') }}#tab-phones"
+           class="adm-nav-link" onclick="switchTabAndScroll('phones')">
+            <i class="bi bi-phone-fill adm-icon" style="color:#1428a0"></i>
+            Phones
+            {% if category_stats is defined %}<span class="adm-badge">{{ category_stats.get('Phones', 0) }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('admin_dashboard') }}#tab-laptops"
+           class="adm-nav-link" onclick="switchTabAndScroll('laptops')">
+            <i class="bi bi-laptop-fill adm-icon" style="color:#f59e0b"></i>
+            Laptops
+            {% if category_stats is defined %}<span class="adm-badge">{{ category_stats.get('Laptops', 0) }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('admin_dashboard') }}#tab-tvs"
+           class="adm-nav-link" onclick="switchTabAndScroll('tvs')">
+            <i class="bi bi-tv-fill adm-icon" style="color:#16a34a"></i>
+            TVs
+            {% if category_stats is defined %}<span class="adm-badge">{{ category_stats.get('TVs', 0) }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('admin_dashboard') }}#tab-accessories"
+           class="adm-nav-link" onclick="switchTabAndScroll('accessories')">
+            <i class="bi bi-headphones adm-icon" style="color:#dc2626"></i>
+            Accessories
+            {% if category_stats is defined %}<span class="adm-badge">{{ category_stats.get('Accessories', 0) }}</span>{% endif %}
+        </a>
+
+        <div class="adm-nav-label mt-2">People</div>
+        <a href="{{ url_for('admin_dashboard') }}#users"
+           class="adm-nav-link" onclick="scrollToUsers()">
+            <i class="bi bi-people-fill adm-icon" style="color:#0891b2"></i>
+            Users
+            {% if users is defined %}<span class="adm-badge">{{ users|length }}</span>{% endif %}
+        </a>
+
+        <div class="adm-nav-label mt-2">Store</div>
+        <a href="{{ url_for('home') }}" class="adm-nav-link" target="_blank">
+            <i class="bi bi-box-arrow-up-right adm-icon"></i>
+            View Store
+        </a>
+    </nav>
+
+    <!-- Sidebar footer -->
+    <div class="adm-sidebar-footer">
+        <a href="{{ url_for('logout') }}" class="adm-nav-link text-danger">
+            <i class="bi bi-box-arrow-left adm-icon"></i>
+            Logout
+        </a>
+    </div>
+</aside>
+
+<!-- Overlay for mobile -->
+<div id="sidebarOverlay" onclick="closeSidebar()"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;"></div>
+
+<!-- ── MAIN ── -->
+<div class="adm-main">
+
+    <!-- Top bar -->
+    <header class="adm-topbar">
+        <div class="adm-topbar-left">
+            <button class="adm-mobile-toggle" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <div>
+                <div class="adm-page-title">{% block page_title %}Dashboard{% endblock %}</div>
+                <div class="adm-breadcrumb">
+                    <a href="{{ url_for('admin_dashboard') }}" style="color:inherit;text-decoration:none;">Admin</a>
+                    <i class="bi bi-chevron-right" style="font-size:0.6rem;"></i>
+                    {% block breadcrumb %}Dashboard{% endblock %}
+                </div>
+            </div>
+        </div>
+        <div class="adm-topbar-right">
+            <div class="adm-admin-pill">
+                <div class="adm-admin-avatar">
+                    {{ current_user.name[0].upper() }}
+                </div>
+                {{ current_user.name }}
+            </div>
+            <a href="{{ url_for('logout') }}"
+               style="color:#dc2626;font-size:1.1rem;text-decoration:none;" title="Logout">
+                <i class="bi bi-power"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="adm-flash">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}x-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}-fill"></i>
+                {{ message }}
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Page content -->
+    <main class="adm-content">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleSidebar() {
+    document.getElementById('adminSidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').style.display =
+        document.getElementById('adminSidebar').classList.contains('open') ? 'block' : 'none';
+}
+function closeSidebar() {
+    document.getElementById('adminSidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').style.display = 'none';
+}
+function switchTabAndScroll(tabId) {
+    // activate the right tab after navigation
+    sessionStorage.setItem('adminActiveTab', tabId);
+}
+function scrollToUsers() {
+    sessionStorage.setItem('adminScrollUsers', '1');
+}
+
+// Auto-dismiss alerts after 4s
+document.querySelectorAll('.alert-dismissible').forEach(el => {
+    setTimeout(() => bootstrap.Alert.getOrCreateInstance(el)?.close(), 4000);
+});
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
