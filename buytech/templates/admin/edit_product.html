@@ -1,0 +1,174 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Edit Product{% endblock %}
+{% block page_title %}Edit Product{% endblock %}
+{% block breadcrumb %}<a href="{{ url_for('admin_dashboard') }}" style="color:inherit;text-decoration:none;">Dashboard</a> <i class="bi bi-chevron-right" style="font-size:0.6rem;"></i> Edit{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="adm-panel">
+            <div class="adm-panel-header">
+                <div class="adm-panel-title">
+                    <i class="bi bi-pencil-fill text-primary"></i>
+                    Editing: {{ product.name }}
+                </div>
+                <a href="{{ url_for('admin_dashboard') }}" class="adm-btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+            <div style="padding:28px;">
+                <form method="POST" action="{{ url_for('admin_edit_product', product_id=product.id) }}"
+                      enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Product Name *</label>
+                            <input type="text" name="name" class="form-control"
+                                   value="{{ product.name }}" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Price (USD) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" name="price" class="form-control"
+                                       step="0.01" min="0" value="{{ product.price }}" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Category *</label>
+                            <select name="category" class="form-select" required>
+                                {% for cat in ['Phones', 'Laptops', 'TVs', 'Accessories'] %}
+                                <option value="{{ cat }}" {% if product.category == cat %}selected{% endif %}>{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Product Image</label>
+                            <div class="current-img-label">Current image:</div>
+                            <img id="pg-current-img" src="{{ product.image }}" alt="{{ product.name }}"
+                                 class="current-img-thumb mb-2" />
+
+                            <div class="img-source-tabs mb-2">
+                                <button type="button" class="img-tab-btn active"
+                                        onclick="switchImgTab('pg','keep',this)">
+                                    <i class="bi bi-check-circle-fill"></i> Keep Current
+                                </button>
+                                <button type="button" class="img-tab-btn"
+                                        onclick="switchImgTab('pg','upload',this)">
+                                    <i class="bi bi-cloud-arrow-up-fill"></i> Upload New
+                                </button>
+                                <button type="button" class="img-tab-btn"
+                                        onclick="switchImgTab('pg','url',this)">
+                                    <i class="bi bi-link-45deg"></i> New URL
+                                </button>
+                            </div>
+                            <!-- Keep -->
+                            <div id="pg-tab-keep" class="img-tab-pane active">
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>Current image will be kept.
+                                </p>
+                            </div>
+                            <!-- Upload -->
+                            <div id="pg-tab-upload" class="img-tab-pane">
+                                <div class="drop-zone" id="pg-drop-zone"
+                                     ondragover="handleDragOver(event)"
+                                     ondragleave="handleDragLeave(event)"
+                                     ondrop="handleDrop(event,'pg')">
+                                    <input type="file" name="image_file" id="pg_file_input"
+                                           accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                                           onchange="handleFileSelect(event,'pg')" style="display:none;" />
+                                    <div id="pg-drop-content"
+                                         onclick="document.getElementById('pg_file_input').click()">
+                                        <i class="bi bi-cloud-arrow-up-fill drop-icon"></i>
+                                        <p class="drop-text">Drag &amp; drop a new image<br>
+                                            <span class="drop-hint">JPG, PNG, WEBP, GIF — max 10MB</span>
+                                        </p>
+                                    </div>
+                                    <div id="pg-file-info" class="file-info d-none">
+                                        <img id="pg-preview-img" src="" alt="" class="upload-preview" />
+                                        <div class="file-meta">
+                                            <span id="pg-file-name" class="file-name"></span>
+                                            <span id="pg-file-size" class="file-size"></span>
+                                            <button type="button" class="clear-btn" onclick="clearFile('pg')">
+                                                <i class="bi bi-x-circle-fill"></i> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- URL -->
+                            <div id="pg-tab-url" class="img-tab-pane">
+                                <input type="url" name="image_url" id="pg_image_url" class="form-control"
+                                       placeholder="https://images.unsplash.com/…"
+                                       oninput="previewUrl('pg_image_url','pg-url-preview')" />
+                                <img id="pg-url-preview" src="" alt="" class="mt-2 rounded-3 d-none"
+                                     style="height:130px;width:100%;object-fit:cover;" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description *</label>
+                            <textarea name="description" class="form-control"
+                                      rows="4" required>{{ product.description }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input type="checkbox" name="featured" class="form-check-input"
+                                       id="featuredCheck" {% if product.featured %}checked{% endif %} />
+                                <label class="form-check-label fw-600" for="featuredCheck">
+                                    <i class="bi bi-star-fill text-warning me-1"></i>
+                                    Mark as Featured (appears on homepage)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex gap-3 pt-2">
+                            <button type="submit" class="adm-btn-primary">
+                                <i class="bi bi-check-lg"></i> Save Changes
+                            </button>
+                            <a href="{{ url_for('admin_dashboard') }}" class="adm-btn-secondary">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchImgTab(prefix, tab, btn) {
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function handleDrop(e, prefix) { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f) setFilePreview(prefix,f); }
+function handleFileSelect(e, prefix) { const f=e.target.files[0]; if(f) setFilePreview(prefix,f); }
+function setFilePreview(prefix, file) {
+    const allowed=['image/jpeg','image/jpg','image/png','image/webp','image/gif'];
+    if(!allowed.includes(file.type)){alert('Invalid file type. Use JPG, PNG, WEBP or GIF.');return;}
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+        document.getElementById(`${prefix}-preview-img`).src=e.target.result;
+        document.getElementById(`${prefix}-file-name`).textContent=file.name;
+        document.getElementById(`${prefix}-file-size`).textContent=formatBytes(file.size);
+        document.getElementById(`${prefix}-drop-content`).classList.add('d-none');
+        document.getElementById(`${prefix}-file-info`).classList.remove('d-none');
+        // Also update the current-img preview at top
+        const cur = document.getElementById('pg-current-img');
+        if(cur) cur.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+    const input=document.getElementById(`${prefix}_file_input`);
+    const dt=new DataTransfer(); dt.items.add(file); input.files=dt.files;
+}
+function clearFile(prefix) {
+    const i=document.getElementById(`${prefix}_file_input`); if(i) i.value='';
+    document.getElementById(`${prefix}-drop-content`)?.classList.remove('d-none');
+    document.getElementById(`${prefix}-file-info`)?.classList.add('d-none');
+}
+function previewUrl(inputId, previewId) {
+    const img=document.getElementById(previewId);
+    img.src=document.getElementById(inputId).value;
+    img.classList.remove('d-none');
+    img.onerror=()=>img.classList.add('d-none');
+}
+function formatBytes(b) { if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(1)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
+</script>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Payment Successful{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+<div class="row justify-content-center">
+<div class="col-lg-6 col-md-8">
+
+    <!-- Animated success card -->
+    <div class="text-center">
+
+        <!-- Checkmark animation -->
+        <div class="success-circle mx-auto mb-4">
+            <svg class="success-svg" viewBox="0 0 52 52">
+                <circle class="success-circle-bg" cx="26" cy="26" r="25" fill="none"/>
+                <path class="success-check" fill="none" d="M14 27 l8 8 l16-18"/>
+            </svg>
+        </div>
+
+        <h2 class="fw-800 mb-1">Payment Successful! 🎉</h2>
+        <p class="text-muted mb-4">
+            Your order has been confirmed and is being processed.
+        </p>
+
+        <!-- Order details card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-start">
+
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                <div style="width:44px;height:44px;background:#e8f5e9;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-receipt-cutoff" style="color:#16a34a;font-size:1.2rem;"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Order Number</div>
+                    <div class="fw-800 fs-5 font-monospace">{{ order_num }}</div>
+                </div>
+                <span class="badge ms-auto px-3 py-2 rounded-pill"
+                      style="background:#e8f5e9;color:#16a34a;font-size:0.75rem;">
+                    <i class="bi bi-check-circle-fill me-1"></i>Confirmed
+                </span>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="text-muted small mb-1">Amount Paid</div>
+                    <div class="fw-800 text-primary fs-5">${{ "%.2f"|format(grand_total) }}</div>
+                </div>
+                <div class="col-6">
+                    <div class="text-muted small mb-1">Items</div>
+                    <div class="fw-700">{{ item_count }} item{{ 's' if item_count != 1 }}</div>
+                </div>
+                <div class="col-6">
+                    <div class="text-muted small mb-1">Payment Method</div>
+                    <div class="fw-700 d-flex align-items-center gap-2">
+                        {% if method == 'promptpay' %}
+                        <span style="width:28px;height:28px;background:#e8f5e9;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-qr-code" style="color:#06a04a;font-size:0.85rem;"></i>
+                        </span>
+                        PromptPay
+                        {% else %}
+                        <span style="width:28px;height:28px;background:#e8eaf6;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-credit-card-fill" style="color:#1428a0;font-size:0.85rem;"></i>
+                        </span>
+                        Credit Card
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="text-muted small mb-1">Estimated Delivery</div>
+                    <div class="fw-700">3–5 Business Days</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What's next -->
+        <div class="card border-0 rounded-4 mb-4 text-start"
+             style="background:#f8f9ff;border:1px solid #e8eaf6!important;">
+            <div class="card-body p-4">
+                <h6 class="fw-700 mb-3">What happens next?</h6>
+                <div class="d-flex gap-3 mb-3">
+                    <div class="next-step-dot" style="background:#1428a0;">1</div>
+                    <div>
+                        <div class="fw-600 small">Order Confirmation</div>
+                        <div class="text-muted small">A confirmation has been recorded for your order.</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 mb-3">
+                    <div class="next-step-dot" style="background:#f59e0b;">2</div>
+                    <div>
+                        <div class="fw-600 small">Processing &amp; Packing</div>
+                        <div class="text-muted small">Your items will be packed within 1 business day.</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-3">
+                    <div class="next-step-dot" style="background:#16a34a;">3</div>
+                    <div>
+                        <div class="fw-600 small">Delivery</div>
+                        <div class="text-muted small">Estimated arrival in 3–5 business days.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{{ url_for('shop') }}" class="btn btn-primary rounded-pill px-5 py-2 fw-600">
+                <i class="bi bi-shop me-2"></i>Continue Shopping
+            </a>
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                <i class="bi bi-house me-2"></i>Home
+            </a>
+        </div>
+
+    </div>
+</div>
+</div>
+</div>
+
+<style>
+/* ── Animated checkmark ── */
+.success-circle {
+    width: 90px; height: 90px;
+}
+.success-svg {
+    width: 90px; height: 90px;
+}
+.success-circle-bg {
+    stroke: #16a34a;
+    stroke-width: 2;
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    animation: circle-in 0.6s ease forwards;
+}
+.success-check {
+    stroke: #16a34a;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: check-in 0.4s 0.5s ease forwards;
+}
+@keyframes circle-in {
+    to { stroke-dashoffset: 0; }
+}
+@keyframes check-in {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ── Next steps ── */
+.next-step-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    color: white; font-size: 0.72rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+}
+</style>
+{% endblock %}
